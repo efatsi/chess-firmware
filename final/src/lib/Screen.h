@@ -20,12 +20,10 @@ public:
       String line_1 = " " + playerString + "'s Move:";
       String line_2 = "   " + move;
 
-      _rawPrint(line_1, line_2);
+      rawPrint(line_1, line_2);
     }
 
-  private:
-
-    void _rawPrint(String line_1, String line_2) {
+    void rawPrint(String line_1, String line_2) {
       lcd->clear();
       lcd->setCursor(0, 0);
       lcd->print(line_1);
@@ -33,13 +31,15 @@ public:
       lcd->print(line_2);
     }
 
+  private:
+
     void _introSequence(String player) {
-      _rawPrint("   Yay Chess!", "       - fat$$");
+      rawPrint("   Yay Chess!", "       - fat$$");
 
       delay(1000);
       _wipeClean();
 
-      _rawPrint(" Playing As:", "      " + player);
+      rawPrint(" Playing As:", "      " + player);
 
       delay(1500);
       _wipeClean();
