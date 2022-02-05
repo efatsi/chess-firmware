@@ -20,8 +20,7 @@ int awayPlayer;
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
 void setup() {
-  Particle.function("screen", updateScreen);
-  Particle.function("light", updateLight);
+  Particle.function("other-move", handleMove);
 
   pinMode(ledPin, OUTPUT);
   pinMode(playerPin, INPUT);
@@ -68,32 +67,38 @@ void confirmChanges(String move) {
     Serial.println(statusCode);
     Serial.println(response);
   } else {
-    screen.printMove(player, move);
-    // screen.rawPrint("   satisfied");
+    // TODO: check if move matches instruction
+    screen.rawPrint("   satisfied");
   }
 
   // Reset board
   board.confirmChanges(currentPlayer);
 
   // Switch players
+  switchPlayers();
+}
+
+void switchPlayers() {
   waitingPlayer = currentPlayer;
   currentPlayer = WHITE + BLACK - currentPlayer;
 }
 
 // Particle Functions
-int updateLight(String command) {
-  if (command == "on") {
-    digitalWrite(ledPin, HIGH);
-  } else {
-    digitalWrite(ledPin, LOW);
-  }
+// int updateLight(String command) {
+//   if (command == "on") {
+//     digitalWrite(ledPin, HIGH);
+//   } else {
+//     digitalWrite(ledPin, LOW);
+//   }
+//
+//   return 1;
+// }
 
-  return 1;
-}
+int handleMove(String instruction) {
+  String player = currentPlayer == WHITE ? "White" : "Black";
+  screen.printMove(player, instruction);
 
-int updateScreen(String player) {
-  // TODO: split on deliminator to split player and move
-  String move = "g4 - h4";
-  screen.printPlayerMove(player, move);
+  switchPlayers();
+
   return 1;
 }

@@ -13,14 +13,6 @@ public:
       _introSequence(player);
     }
 
-    void printPlayerMove(String player, String move) {
-      lcd->clear();
-
-      lcd->print(" " + player + "'s Move:");
-      lcd->setCursor(0, 1);
-      lcd->print("    " + move);
-    }
-
     void printMove(String player, String move) {
       lcd->clear();
 
