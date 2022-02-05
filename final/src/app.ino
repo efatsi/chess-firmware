@@ -1,5 +1,6 @@
 #include "lib/Screen.h"
 #include "lib/Board.h"
+#include "lib/Constants.h"
 
 #include "utils/rest_client.h"
 
@@ -54,9 +55,8 @@ void loop() {
 
 void confirmChanges(String move) {
   // Print move locally
-  String player = currentPlayer == WHITE ? "White" : "Black";
   if (homePlayer == currentPlayer) {
-    screen.printMove(player, move);
+    screen.printMove(currentPlayer, move);
 
     Serial.println("Posting: /games/4/move?move=" + move);
 
@@ -68,17 +68,14 @@ void confirmChanges(String move) {
     Serial.println(response);
   } else {
     // TODO: check if move matches instruction
-    screen.rawPrint("   satisfied");
+    screen.printMove(currentPlayer, "satisfied");
+
   }
 
   // Reset board
   board.confirmChanges(currentPlayer);
 
   // Switch players
-  switchPlayers();
-}
-
-void switchPlayers() {
   waitingPlayer = currentPlayer;
   currentPlayer = WHITE + BLACK - currentPlayer;
 }
@@ -95,10 +92,7 @@ void switchPlayers() {
 // }
 
 int handleMove(String instruction) {
-  String player = currentPlayer == WHITE ? "White" : "Black";
-  screen.printMove(player, instruction);
-
-  switchPlayers();
+  screen.printMove(currentPlayer, instruction + " ...");
 
   return 1;
 }

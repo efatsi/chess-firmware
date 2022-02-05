@@ -6,11 +6,6 @@ class Position {
   #define UNSTABLE_DOWN 3
   #define STABLE_DOWN   4
 
-  // occupiedBy
-  #define EMPTY 0
-  #define WHITE 1
-  #define BLACK 2
-
   #define CONFIRM_TIME 1000
 
 public:

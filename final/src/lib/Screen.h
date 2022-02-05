@@ -1,3 +1,5 @@
+#include "lib/Constants.h"
+
 #include <LiquidCrystal.h>
 
 class Screen {
@@ -13,34 +15,31 @@ public:
       _introSequence(player);
     }
 
-    void printMove(String player, String move) {
-      lcd->clear();
+    void printMove(int player, String move) {
+      String playerString = player == WHITE ? "White" : "Black";
+      String line_1 = " " + playerString + "'s Move:";
+      String line_2 = "   " + move;
 
-      lcd->print(" " + player + "'s Move:");
-      lcd->setCursor(0, 1);
-      lcd->print("    " + move);
-    }
-
-    void rawPrint(String output) {
-      lcd->clear();
-      lcd->print(output);
+      _rawPrint(line_1, line_2);
     }
 
   private:
 
-    void _introSequence(String player) {
-      lcd->print("   Yay Chess!");
+    void _rawPrint(String line_1, String line_2) {
+      lcd->clear();
+      lcd->setCursor(0, 0);
+      lcd->print(line_1);
       lcd->setCursor(0, 1);
-      lcd->print("       - fat$$");
+      lcd->print(line_2);
+    }
+
+    void _introSequence(String player) {
+      _rawPrint("   Yay Chess!", "       - fat$$");
 
       delay(1000);
       _wipeClean();
 
-      lcd->setCursor(0, 0);
-      lcd->print(" Playing As:");
-      lcd->setCursor(0, 1);
-      lcd->print("      ");
-      lcd->print(player);
+      _rawPrint(" Playing As:", "      " + player);
 
       delay(1500);
       _wipeClean();
