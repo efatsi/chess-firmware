@@ -38,6 +38,8 @@ void setup() {
   board.init(homePlayer, awayPlayer);
   screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
+  screen.rawPrint("    Connecting...");
+
   Particle.connect();
   while (!Particle.connected()) {
     // block until connection is established
@@ -90,8 +92,15 @@ void requestConnect() {
   Response response = request.post(url);
 
   if (response.success()) {
+    // Store game_id for move posting
     gameId = response.dig("game_id");
     Serial.println("Got a game_id: " + gameId);
+
+    // Set current player
+
+    // Set board fen state
+
+    // Print current game message
     screen.rawPrint("   Connected!", response.message());
   } else {
     Serial.println("Failed response: " + response.error());
