@@ -36,11 +36,14 @@ void setup() {
   }
 
   board.init(homePlayer, awayPlayer);
-  screen.init(homePlayer == WHITE ? "WHITE" : "BLACK");
+  screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
   Particle.connect();
+  while (!Particle.connected()) {
+    // block until connection is established
+    delay(100);
+  }
 
-  delay(1000); // Give Particle.connect() time to block or something
   requestConnect();
 }
 
@@ -54,6 +57,7 @@ void loop() {
   // board.printBinary();
   // board.printReadings();
   board.printFullStatus();
+
   delay(50);
 }
 
@@ -80,17 +84,18 @@ int handleMove(String instruction) {
 }
 
 void requestConnect() {
-  String color = currentPlayer == WHITE ? "white" : "black";
+  String color = homePlayer == WHITE ? "white" : "black";
   String params = "?device_id=" + System.deviceID() + "&color=" + color;
   String url = "/games/connect" + params;
   Response response = request.post(url);
 
-  if (response.success) {
+  if (response.success()) {
     gameId = response.dig("game_id");
     Serial.println("Got a game_id: " + gameId);
-    screen.rawPrint("   Connected!", response.message);
+    screen.rawPrint("   Connected!", response.message());
   } else {
-    screen.rawPrint("Error: ", response.message);
+    Serial.println("Failed response: " + response.error());
+    screen.rawPrint("Error: ", response.error());
   }
 }
 
@@ -98,9 +103,11 @@ void postMove(String move) {
   String url = "/games/" + gameId + "/move?move=" + move;
   Response response = request.post(url);
 
-  if (response.success) {
+  if (response.success()) {
+    Serial.println("Successful move!");
     digitalWrite(ledPin, LOW);
   } else {
-    screen.rawPrint("Error: ", response.message);
+    Serial.println("Failed response: " + response.error());
+    screen.rawPrint("Error: ", response.error());
   }
 }

@@ -8,11 +8,7 @@ public:
 
     Screen() {
       lcd = new LiquidCrystal(A0, A1, A2, A3, A4, A5);
-    }
-
-    void init(String player) {
       lcd->begin(16, 2);
-      _introSequence(player);
     }
 
     void printMove(int player, String move) {
@@ -31,9 +27,7 @@ public:
       lcd->print(line_2);
     }
 
-  private:
-
-    void _introSequence(String player) {
+    void introSequence(String player) {
       rawPrint("   Yay Chess!", "       - fat$$");
 
       delay(1000);
@@ -44,6 +38,8 @@ public:
       delay(1500);
       _wipeClean();
     }
+
+  private:
 
     void _wipeClean() {
       lcd->setCursor(0, 0);
