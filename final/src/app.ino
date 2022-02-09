@@ -1,16 +1,14 @@
+SYSTEM_MODE(SEMI_AUTOMATIC);
+
 #include "lib/Screen.h"
 #include "lib/Board.h"
 #include "lib/Constants.h"
-
-#include "utils/rest_client.h"
-#include <JsonParserGeneratorRK.h>
-
-RestClient client = RestClient("6991-2601-5c2-201-7a90-1caf-5e81-96ed-61fd.ngrok.io");
+#include "lib/api/Request.h"
 
 Screen screen;
 Board board;
 
-// technically an int, but used as a string
+Request request;
 String gameId;
 
 int ledPin    = D7;
@@ -22,10 +20,6 @@ int waitingPlayer = BLACK;
 int homePlayer;
 int awayPlayer;
 
-// parse max of 1024 bytes w/ 10 tokens (hopefully this holds everything)
-JsonParserStatic<1024, 10> parser;
-
-SYSTEM_MODE(SEMI_AUTOMATIC);
 
 void setup() {
   Particle.function("other-move", handleMove);
@@ -46,6 +40,7 @@ void setup() {
 
   Particle.connect();
 
+  delay(1000); // Give Particle.connect() time to block or something
   requestConnect();
 }
 
@@ -63,20 +58,16 @@ void loop() {
 }
 
 void confirmChanges(String move) {
-  // Print move locally
   if (homePlayer == currentPlayer) {
     screen.printMove(currentPlayer, move);
-
     postMove(move);
   } else {
     // TODO: check if move matches instruction
     screen.printMove(currentPlayer, "satisfied");
   }
 
-  // Reset board
   board.confirmChanges(currentPlayer);
 
-  // Switch players
   waitingPlayer = currentPlayer;
   currentPlayer = WHITE + BLACK - currentPlayer;
 }
@@ -89,73 +80,27 @@ int handleMove(String instruction) {
 }
 
 void requestConnect() {
-  // Make request
-  String color = currentPlayer == WHITE ? "White" : "Black";
+  String color = currentPlayer == WHITE ? "white" : "black";
   String params = "?device_id=" + System.deviceID() + "&color=" + color;
   String url = "/games/connect" + params;
-  Serial.println("Posting: " + url);
+  Response response = request.post(url);
 
-  String response;
-  int statusCode = client.get(url, &response);
-
-  Serial.println("Response got");
-  Serial.println(statusCode);
-  Serial.println(response);
-  Serial.println();
-
-  // Parse response
-  parser.clear();
-  parser.addString(response);
-  if (parser.parse()) {
-    bool success;
-    parser.getOuterValueByKey("success", success);
-
-    if (success) {
-      // Store gameId on global variable
-      parser.getOuterValueByKey("game_id", gameId);
-
-      String message;
-      parser.getOuterValueByKey("message", message);
-      screen.rawPrint("   Connected!", message);
-    } else {
-      String message;
-      parser.getOuterValueByKey("message", message);
-      screen.rawPrint("Error: ", message);
-    }
+  if (response.success) {
+    gameId = response.dig("game_id");
+    Serial.println("Got a game_id: " + gameId);
+    screen.rawPrint("   Connected!", response.message);
   } else {
-    // TODO: handle failed parse
+    screen.rawPrint("Error: ", response.message);
   }
 }
 
 void postMove(String move) {
-  // Make request
   String url = "/games/" + gameId + "/move?move=" + move;
-  Serial.println("Posting: " + url);
+  Response response = request.post(url);
 
-  String response;
-  int statusCode = client.post(url, &response);
-
-  Serial.println("Response got");
-  Serial.println(statusCode);
-  Serial.println(response);
-  Serial.println();
-
-  // Parse response
-  parser.clear();
-  parser.addString(response);
-  if (parser.parse()) {
-    bool success;
-    parser.getOuterValueByKey("success", success);
-
-    if (success) {
-      // move succeeded, turn off player light
-      digitalWrite(ledPin, LOW);
-    } else {
-      String message;
-      parser.getOuterValueByKey("message", message);
-      screen.rawPrint("Error: ", message);
-    }
+  if (response.success) {
+    digitalWrite(ledPin, LOW);
   } else {
-    // TODO: handle failed parse
+    screen.rawPrint("Error: ", response.message);
   }
 }
