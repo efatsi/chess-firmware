@@ -15,7 +15,6 @@ int ledPin    = D7;
 int playerPin = D6;
 
 int currentPlayer = WHITE;
-int waitingPlayer = BLACK;
 
 int homePlayer;
 int awayPlayer;
@@ -39,7 +38,6 @@ void setup() {
   screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
   screen.rawPrint("    Connecting...");
-
   Particle.connect();
   while (!Particle.connected()) {
     // block until connection is established
@@ -74,7 +72,6 @@ void confirmChanges(String move) {
 
   board.confirmChanges(currentPlayer);
 
-  waitingPlayer = currentPlayer;
   currentPlayer = WHITE + BLACK - currentPlayer;
 }
 
@@ -97,8 +94,12 @@ void requestConnect() {
     Serial.println("Got a game_id: " + gameId);
 
     // Set current player
+    String player = response.dig("player");
+    currentPlayer = (player == "white" ? WHITE : BLACK);
 
     // Set board fen state
+    String fen = response.dig("fen");
+    board.resetState(fen);
 
     // Print current game message
     screen.rawPrint("   Connected!", response.message());

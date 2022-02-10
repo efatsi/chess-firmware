@@ -149,6 +149,42 @@ public:
     }
   }
 
+  void resetState(String fen) {
+    // eg: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR"
+    int i = 0;
+    int j = 0;
+
+    String whitePieces = "PRNBQK";
+    String blackPieces = "prnbqk";
+    String blanks      = "12345678";
+
+    for (size_t x = 0; x < fen.length(); x++) {
+      char ch = fen.charAt(x);
+
+      if (blanks.indexOf(ch) != -1) {
+        for (int y = 0; y < String(ch).toInt(); y++) {
+          positions[(i * 8) + j].resetState(EMPTY);
+          j++;
+        }
+      } else if (whitePieces.indexOf(ch) != -1) {
+        positions[(i * 8) + j].resetState(WHITE);
+        j++;
+      } else if (blackPieces.indexOf(ch) != -1) {
+        positions[(i * 8) + j].resetState(BLACK);
+        j++;
+      } else if (ch == '/') {
+        if (j != 8) { Serial.println("Failed FEN parse, row " + String(i) + " ended with only " + String(j) + "/8 pieces"); }
+
+        i++;
+        j = 0;
+      }
+    }
+
+    // Ensure ended on correct counts
+    if (i != 7) { Serial.println("Failed FEN parse, parsed " + String(i + 1) + "/8 rows"); }
+    if (j != 8) { Serial.println("Failed FEN parse, row " + String(i) + " ended with only " + String(j) + "/8 pieces"); }
+  }
+
   void printReadings() {
     for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {

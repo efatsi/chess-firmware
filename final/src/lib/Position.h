@@ -20,7 +20,11 @@ public:
   long   lastChange;
 
   Position(String newPosition, int newOccupiedBy) {
-    position   = newPosition;
+    position = newPosition;
+    resetState(newOccupiedBy);
+  }
+
+  void resetState(int newOccupiedBy) {
     status     = CONFIRMED;
     occupiedBy = newOccupiedBy;
     value      = occupiedBy ? true : false;
