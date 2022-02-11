@@ -32,10 +32,14 @@ public:
     lastChange = 0;
   }
 
-  void setNewValue(int newValue, long currentTime) {
+  void setNewValue(int newValue, long currentTime, bool stable) {
     value = newValue;
 
-    if (value && !_downStatus()) {
+    if (!stable && value == startValue()) {
+      // still honing in on stable board
+      changed = false;
+      status = CONFIRMED;
+    } else if (value && !_downStatus()) {
       changed    = true;
       lastChange = currentTime;
       status     = UNSTABLE_DOWN;
@@ -50,8 +54,8 @@ public:
     if (!changed) return;
 
     if (value) {
-      // replacing piece
-      if (upCount == 0 || occupiedBy == currentPlayer) {
+      // replacing piece || down w/o a companion up
+      if (occupiedBy == currentPlayer || upCount == 0) {
         status = CONFIRMED;
         changed = false;
       }

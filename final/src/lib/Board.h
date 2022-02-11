@@ -96,6 +96,9 @@ public:
   ChangedPosition downs[5];
 
   String moveString;
+  String requiredFixes;
+
+  bool stable = false;
 
   Board() {}
 
@@ -116,9 +119,13 @@ public:
     _fetchSensorData();
     _calculateNorm();
     _setStatuses();
-
     _countUpsAndDowns();
-    _verifyStatuses();
+
+    if (stable) {
+      _verifyStatuses();
+    } else {
+      _identifyInvalidPositions();
+    }
   }
 
   bool moveDetected() {
@@ -151,12 +158,12 @@ public:
 
   void resetState(String fen) {
     // eg: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR"
-    int i = 0;
-    int j = 0;
-
     String whitePieces = "PRNBQK";
     String blackPieces = "prnbqk";
     String blanks      = "12345678";
+
+    int i = 0;
+    int j = 0;
 
     for (size_t x = 0; x < fen.length(); x++) {
       char ch = fen.charAt(x);
@@ -173,16 +180,12 @@ public:
         positions[(i * 8) + j].resetState(BLACK);
         j++;
       } else if (ch == '/') {
-        if (j != 8) { Serial.println("Failed FEN parse, row " + String(i) + " ended with only " + String(j) + "/8 pieces"); }
-
         i++;
         j = 0;
       }
     }
 
-    // Ensure ended on correct counts
-    if (i != 7) { Serial.println("Failed FEN parse, parsed " + String(i + 1) + "/8 rows"); }
-    if (j != 8) { Serial.println("Failed FEN parse, row " + String(i) + " ended with only " + String(j) + "/8 pieces"); }
+    stable = false;
   }
 
   void printReadings() {
@@ -215,6 +218,12 @@ public:
   }
 
   void printFullStatus() {
+    Serial.println();
+    Serial.print("Up count:   ");
+    Serial.println(allUpCount);
+    Serial.print("Down count: ");
+    Serial.println(allDownCount);
+
     for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {
         int index = (i * 8) + j;
@@ -295,6 +304,10 @@ public:
     Serial.println();
   }
 
+  bool unstable() {
+    return !stable;
+  }
+
 private:
 
   void _fetchSensorData() {
@@ -336,7 +349,7 @@ private:
       bool newValue = (position.reading * 100 / upperNorm) < lowPercentage;
 
       if (newValue != position.startValue() || newValue != position.value) {
-        position.setNewValue(newValue, currentTime);
+        position.setNewValue(newValue, currentTime, stable);
       }
 
       position.checkStability(currentTime);
@@ -379,6 +392,21 @@ private:
     for (int i = 0; i < 64; i++) {
       Position &position = positions[i];
       position.verifyStatus(allUpCount, allDownCount, currentPlayer);
+    }
+  }
+
+  void _identifyInvalidPositions() {
+    if (allUpCount == 0 && allDownCount == 0) {
+      stable = true;
+    } else {
+      requiredFixes = "";
+
+      for (size_t i = 0; i < stableUpCount; i++) {
+        requiredFixes = requiredFixes + ups[i].position + " ";
+      }
+      for (size_t i = 0; i < stableDownCount; i++) {
+        requiredFixes = requiredFixes + downs[i].position + " ";
+      }
     }
   }
 

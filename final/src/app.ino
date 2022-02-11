@@ -37,7 +37,7 @@ void setup() {
   board.init(homePlayer, awayPlayer);
   screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
-  screen.rawPrint("    Connecting...");
+  screen.rawPrint(" Connecting...");
   Particle.connect();
   while (!Particle.connected()) {
     // block until connection is established
@@ -50,7 +50,9 @@ void setup() {
 void loop() {
   board.determineState(currentPlayer);
 
-  if (board.moveDetected()) {
+  if (board.unstable()) {
+    screen.rawPrint("Fix positions:", board.requiredFixes);
+  } else if (board.moveDetected()) {
     confirmChanges(board.moveString);
   }
 
