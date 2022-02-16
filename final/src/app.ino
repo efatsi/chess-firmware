@@ -59,9 +59,14 @@ void confirmChanges(String move) {
 
   if (homePlayer == gameState.currentPlayer) {
     screen.printMove(gameState.currentPlayer, move);
-    api.postMove(move);
+
+    bool success = api.postMove(move);
+    if (!success) {
+      board.resetState(gameState.currentFen);
+      return;
+    }
   } else {
-    board.resetState(gameState.currentPlayer, gameState.currentFen);
+    board.resetState(gameState.currentFen);
 
     if (board.stable) {
       screen.printMove(gameState.currentPlayer, "satisfied");

@@ -28,16 +28,20 @@ public:
     _connectToBoard();
   }
 
-  void postMove(String move) {
+  bool postMove(String move) {
     String url = "/games/" + gameId + "/move?move=" + move;
     Response response = request.post(url);
 
     if (response.success()) {
-      Serial.println("Successful move!");
+      gameState->currentFen = response.dig("fen");
       digitalWrite(ledPin, LOW);
+
+      return true;
     } else {
-      Serial.println("Failed response: " + response.error());
+      gameState->currentFen = response.dig("fen");
       screen->rawPrint("Error: ", response.error());
+
+      return false;
     }
   }
 
@@ -74,14 +78,14 @@ private:
       // Set board fen state
       String fen = response.dig("fen");
       gameState->currentFen = fen;
-      board->resetState(gameState->currentPlayer, gameState->currentFen);
+      board->resetState(gameState->currentFen);
 
       // Save and print current game message
       gameState->currentMessage = response.message();
       screen->rawPrint("   Connected!", response.message());
     } else {
       Serial.println("Failed response: " + response.error());
-      screen->rawPrint("Error: ", response.error());
+      screen->rawPrint("Invalid Move: ", response.error());
     }
   }
 };

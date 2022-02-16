@@ -110,10 +110,7 @@ public:
   }
 
   void determineState(int currentPlayer) {
-    _fetchSensorData();
-    _calculateNorm();
-    _setStatuses();
-    _countUpsAndDowns();
+    _determinePositionStates();
 
     if (stable) {
       _verifyStatuses(currentPlayer);
@@ -150,7 +147,7 @@ public:
     }
   }
 
-  void resetState(int currentPlayer, String fen) {
+  void resetState(String fen) {
     // eg: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR"
     String whitePieces = "PRNBQK";
     String blackPieces = "prnbqk";
@@ -180,7 +177,9 @@ public:
     }
 
     stable = false;
-    determineState(currentPlayer);
+
+    _determinePositionStates();
+    _identifyInvalidPositions();
   }
 
   void printReadings() {
@@ -304,6 +303,13 @@ public:
   }
 
 private:
+
+  void _determinePositionStates() {
+    _fetchSensorData();
+    _calculateNorm();
+    _setStatuses();
+    _countUpsAndDowns();
+  }
 
   void _fetchSensorData() {
     for (int i = 0; i < 8; i++) {
