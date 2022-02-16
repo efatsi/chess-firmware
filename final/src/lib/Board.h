@@ -81,8 +81,6 @@ public:
   const int slavePins[3]  = {D3, D4, D5};
   const int sensorPin = A6;
 
-  int currentPlayer;
-
   int allReadings[64];
   int upperNorm;
   const int lowPercentage = 15;
@@ -111,22 +109,20 @@ public:
     pinMode(sensorPin, INPUT);
   }
 
-  void determineState(int cp) {
-    currentPlayer = cp;
-
+  void determineState(int currentPlayer) {
     _fetchSensorData();
     _calculateNorm();
     _setStatuses();
     _countUpsAndDowns();
 
     if (stable) {
-      _verifyStatuses();
+      _verifyStatuses(currentPlayer);
     } else {
       _identifyInvalidPositions();
     }
   }
 
-  bool moveDetected() {
+  bool moveDetected(int currentPlayer) {
     if (unstableCount > 0) return false;
 
     int waitingPlayer = WHITE + BLACK - currentPlayer;
@@ -154,7 +150,7 @@ public:
     }
   }
 
-  void resetState(String fen) {
+  void resetState(int currentPlayer, String fen) {
     // eg: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR"
     String whitePieces = "PRNBQK";
     String blackPieces = "prnbqk";
@@ -184,6 +180,7 @@ public:
     }
 
     stable = false;
+    determineState(currentPlayer);
   }
 
   void printReadings() {
@@ -386,7 +383,7 @@ private:
     }
   }
 
-  void _verifyStatuses() {
+  void _verifyStatuses(int currentPlayer) {
     for (int i = 0; i < 64; i++) {
       Position &position = positions[i];
       position.verifyStatus(allUpCount, allDownCount, currentPlayer);

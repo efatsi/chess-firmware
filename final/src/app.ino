@@ -1,5 +1,6 @@
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
+#include <JsonParserGeneratorRK.h>
 #include "lib/GameState.h"
 #include "lib/Screen.h"
 #include "lib/Board.h"
@@ -42,7 +43,7 @@ void loop() {
 
   if (board.unstable()) {
     screen.rawPrint("Fix positions:", board.requiredFixes);
-  } else if (board.moveDetected()) {
+  } else if (board.moveDetected(gameState.currentPlayer)) {
     confirmChanges(board.moveString);
   }
 
@@ -54,22 +55,42 @@ void loop() {
 }
 
 void confirmChanges(String move) {
+  board.confirmChanges(gameState.currentPlayer);
+
   if (homePlayer == gameState.currentPlayer) {
     screen.printMove(gameState.currentPlayer, move);
     api.postMove(move);
   } else {
-    // TODO: check if move matches instruction
-    screen.printMove(gameState.currentPlayer, "satisfied");
-  }
+    board.resetState(gameState.currentPlayer, gameState.currentFen);
 
-  board.confirmChanges(gameState.currentPlayer);
+    if (board.stable) {
+      screen.printMove(gameState.currentPlayer, "satisfied");
+    }
+  }
 
   gameState.nextPlayer();
 }
 
-int handleMove(String instruction) {
-  screen.printMove(gameState.currentPlayer, instruction + " ...");
-  digitalWrite(ledPin, HIGH);
+int handleMove(String data) {
+  JsonParser parser;
+  parser.clear();
+  parser.addString(data);
 
-  return 1;
+  if (parser.parse()) {
+    // Store new fen string
+    parser.getOuterValueByKey("fen", gameState.currentFen);
+
+    // Print move from other player
+    String instruction;
+    parser.getOuterValueByKey("move", instruction);
+    screen.printMove(gameState.currentPlayer, instruction + " ...");
+
+    // Turn on light - indicating it's home player's turn
+    digitalWrite(ledPin, HIGH);
+
+    return 1;
+  } else {
+    screen.rawPrint("Invalid JSON from web", data);
+    return 0;
+  }
 }

@@ -73,7 +73,8 @@ private:
 
       // Set board fen state
       String fen = response.dig("fen");
-      board->resetState(fen);
+      gameState->currentFen = fen;
+      board->resetState(gameState->currentPlayer, gameState->currentFen);
 
       // Save and print current game message
       gameState->currentMessage = response.message();
