@@ -1,24 +1,21 @@
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
+#include "lib/GameState.h"
 #include "lib/Screen.h"
 #include "lib/Board.h"
 #include "lib/Constants.h"
-#include "lib/api/Request.h"
+#include "lib/Api.h"
 
+GameState gameState;
 Screen screen;
 Board board;
-
-Request request;
-String gameId;
+Api api;
 
 int ledPin    = D7;
 int playerPin = D6;
 
-int currentPlayer = WHITE;
-
 int homePlayer;
 int awayPlayer;
-
 
 void setup() {
   Particle.function("other-move", handleMove);
@@ -34,21 +31,14 @@ void setup() {
     awayPlayer = WHITE;
   }
 
-  board.init(homePlayer, awayPlayer);
   screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
-  screen.rawPrint(" Connecting...");
-  Particle.connect();
-  while (!Particle.connected()) {
-    // block until connection is established
-    delay(100);
-  }
-
-  requestConnect();
+  api.init(homePlayer, &screen, &board, &gameState);
+  api.connectToTheInternets();
 }
 
 void loop() {
-  board.determineState(currentPlayer);
+  board.determineState(gameState.currentPlayer);
 
   if (board.unstable()) {
     screen.rawPrint("Fix positions:", board.requiredFixes);
@@ -64,62 +54,22 @@ void loop() {
 }
 
 void confirmChanges(String move) {
-  if (homePlayer == currentPlayer) {
-    screen.printMove(currentPlayer, move);
-    postMove(move);
+  if (homePlayer == gameState.currentPlayer) {
+    screen.printMove(gameState.currentPlayer, move);
+    api.postMove(move);
   } else {
     // TODO: check if move matches instruction
-    screen.printMove(currentPlayer, "satisfied");
+    screen.printMove(gameState.currentPlayer, "satisfied");
   }
 
-  board.confirmChanges(currentPlayer);
+  board.confirmChanges(gameState.currentPlayer);
 
-  currentPlayer = WHITE + BLACK - currentPlayer;
+  gameState.nextPlayer();
 }
 
 int handleMove(String instruction) {
-  screen.printMove(currentPlayer, instruction + " ...");
+  screen.printMove(gameState.currentPlayer, instruction + " ...");
   digitalWrite(ledPin, HIGH);
 
   return 1;
-}
-
-void requestConnect() {
-  String color = homePlayer == WHITE ? "white" : "black";
-  String params = "?device_id=" + System.deviceID() + "&color=" + color;
-  String url = "/games/connect" + params;
-  Response response = request.post(url);
-
-  if (response.success()) {
-    // Store game_id for move posting
-    gameId = response.dig("game_id");
-    Serial.println("Got a game_id: " + gameId);
-
-    // Set current player
-    String player = response.dig("player");
-    currentPlayer = (player == "white" ? WHITE : BLACK);
-
-    // Set board fen state
-    String fen = response.dig("fen");
-    board.resetState(fen);
-
-    // Print current game message
-    screen.rawPrint("   Connected!", response.message());
-  } else {
-    Serial.println("Failed response: " + response.error());
-    screen.rawPrint("Error: ", response.error());
-  }
-}
-
-void postMove(String move) {
-  String url = "/games/" + gameId + "/move?move=" + move;
-  Response response = request.post(url);
-
-  if (response.success()) {
-    Serial.println("Successful move!");
-    digitalWrite(ledPin, LOW);
-  } else {
-    Serial.println("Failed response: " + response.error());
-    screen.rawPrint("Error: ", response.error());
-  }
 }

@@ -100,9 +100,7 @@ public:
 
   bool stable = false;
 
-  Board() {}
-
-  void init(int homePlayer, int awayPlayer) {
+  Board() {
     pinMode(D0, OUTPUT);
     pinMode(D1, OUTPUT);
     pinMode(D2, OUTPUT);
@@ -401,10 +399,10 @@ private:
     } else {
       requiredFixes = "";
 
-      for (size_t i = 0; i < stableUpCount; i++) {
+      for (int i = 0; i < stableUpCount; i++) {
         requiredFixes = requiredFixes + ups[i].position + " ";
       }
-      for (size_t i = 0; i < stableDownCount; i++) {
+      for (int i = 0; i < stableDownCount; i++) {
         requiredFixes = requiredFixes + downs[i].position + " ";
       }
     }
