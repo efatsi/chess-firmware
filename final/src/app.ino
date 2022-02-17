@@ -41,9 +41,17 @@ void setup() {
 void loop() {
   board.determineState(gameState.currentPlayer);
 
+  // Check you're starting a move at the current FED state
   if (board.unstable()) {
+    board.wasUnstable = true;
     screen.rawPrint("Fix positions:", board.requiredFixes);
-  } else if (board.moveDetected(gameState.currentPlayer)) {
+  } else if (board.wasUnstable) {
+    board.wasUnstable = false;
+    screen.rawPrint(gameState.currentMessage);
+  }
+
+  // Check for a confirmed move
+  if (board.moveDetected(gameState.currentPlayer)) {
     confirmChanges(board.moveString);
   }
 

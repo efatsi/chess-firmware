@@ -97,6 +97,7 @@ public:
   String requiredFixes;
 
   bool stable = false;
+  bool wasUnstable = false;
 
   Board() {
     pinMode(D0, OUTPUT);
