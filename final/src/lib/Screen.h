@@ -5,6 +5,7 @@
 class Screen {
 public:
     LiquidCrystal *lcd;
+    String currentMessage;
 
     Screen() {
       lcd = new LiquidCrystal(A0, A1, A2, A3, A4, A5);
@@ -21,11 +22,16 @@ public:
 
     void rawPrint(String line_1) { rawPrint(line_1, ""); }
     void rawPrint(String line_1, String line_2) {
+      String newMessage = line_1 + line_2;
+      if (newMessage == currentMessage) { return; }
+
       lcd->clear();
       lcd->setCursor(0, 0);
       lcd->print(line_1);
       lcd->setCursor(0, 1);
       lcd->print(line_2);
+
+      currentMessage = newMessage;
     }
 
     void introSequence(String player) {
