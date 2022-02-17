@@ -34,12 +34,18 @@ public:
 
     if (response.success()) {
       gameState->currentFen = response.dig("fen");
+      gameState->currentMessage = response.dig("message");
       digitalWrite(ledPin, LOW);
+
+      screen->rawPrint("Success!", gameState->currentMessage);
+      delay(1000);
+      screen->rawPrint(gameState->currentMessage);
 
       return true;
     } else {
       gameState->currentFen = response.dig("fen");
-      screen->rawPrint("Error: ", response.error());
+      screen->rawPrint("Error:", response.error());
+      delay(1000);
 
       return false;
     }
