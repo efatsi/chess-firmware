@@ -55,10 +55,10 @@ private:
   void _waitForConnection() {
     int dotCount = 3;
     while (!Particle.connected()) {
-      delay(100);
+      delay(200);
 
       String toPrint = " Connecting";
-      dotCount = (dotCount % 3) + 1;
+      dotCount = (dotCount + 1) % 4;
       for (int i = 0; i < dotCount; i++) {
         toPrint += ".";
       }

@@ -48,10 +48,8 @@ void loop() {
   } else if (board.wasUnstable) {
     board.wasUnstable = false;
     screen.rawPrint(gameState.currentMessage);
-  }
-
-  // Check for a confirmed move
-  if (board.moveDetected(gameState.currentPlayer)) {
+  } else if (board.moveDetected(gameState.currentPlayer)) {
+    // Check for a confirmed move
     confirmChanges(board.moveString);
   }
 
