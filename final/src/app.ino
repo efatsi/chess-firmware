@@ -10,10 +10,11 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 
 GameState gameState;
 Screen screen;
-Printer printer;
 
-Board board;
-Api api;
+Board board(&screen, &gameState);
+Api api(&screen, &board, &gameState);
+
+Printer printer(&board, &gameState);
 
 int ledPin    = D7;
 int playerPin = D6;
@@ -37,9 +38,7 @@ void setup() {
 
   screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
-  printer.init(&board, &gameState);
-  board.init(&screen, &gameState);
-  api.init(homePlayer, &screen, &board, &gameState);
+  api.init(homePlayer);
   api.connectToTheInternets();
 }
 

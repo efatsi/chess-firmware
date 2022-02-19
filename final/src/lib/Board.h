@@ -100,7 +100,7 @@ public:
   bool stable = false;
   bool wasUnstable = false;
 
-  Board() {
+  Board(Screen* s, GameState* gs) {
     pinMode(D0, OUTPUT);
     pinMode(D1, OUTPUT);
     pinMode(D2, OUTPUT);
@@ -109,9 +109,7 @@ public:
     pinMode(D5, OUTPUT);
 
     pinMode(sensorPin, INPUT);
-  }
 
-  void init(Screen* s, GameState* gs) {
     screen = s;
     gameState = gs;
   }

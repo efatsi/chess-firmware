@@ -10,11 +10,14 @@ public:
   String gameId;
   Request request;
 
-  void init(int h, Screen* s, Board* b, GameState* gs) {
-    homePlayer = h;
+  Api(Screen* s, Board* b, GameState* gs) {
     screen = s;
     board = b;
     gameState = gs;
+  }
+
+  void init(int h) {
+    homePlayer = h;
   }
 
   void connectToTheInternets() {

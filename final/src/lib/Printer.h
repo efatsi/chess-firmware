@@ -9,7 +9,7 @@ public:
   bool printing = false;
   int printMode = 1;
 
-  void init(Board* b, GameState* gs) {
+  Printer(Board* b, GameState* gs) {
     board = b;
     gameState = gs;
   }
