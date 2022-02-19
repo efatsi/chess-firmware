@@ -79,8 +79,9 @@ int handleMove(String data) {
   parser.addString(data);
 
   if (parser.parse()) {
-    // Store new fen string
+    // Store new game data
     parser.getOuterValueByKey("fen", gameState.currentFen);
+    parser.getOuterValueByKey("message", gameState.currentMessage);
 
     // Print move from other player
     String instruction;
