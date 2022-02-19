@@ -69,6 +69,8 @@ void confirmChanges(String move) {
     }
   } else {
     board.resetState(gameState.currentFen);
+
+    digitalWrite(ledPin, LOW);
     screen.temporaryPrintMove(gameState.currentPlayer, "satisfied");
   }
 

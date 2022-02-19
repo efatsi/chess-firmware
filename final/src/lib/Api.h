@@ -10,8 +10,6 @@ public:
   String gameId;
   Request request;
 
-  int ledPin = D7;
-
   void init(int h, Screen* s, Board* b, GameState* gs) {
     homePlayer = h;
     screen = s;
@@ -35,7 +33,6 @@ public:
     if (response.success()) {
       gameState->currentFen = response.dig("fen");
       gameState->currentMessage = response.dig("message");
-      digitalWrite(ledPin, LOW);
 
       screen->temporaryRawPrint("Success!", gameState->currentMessage);
 
