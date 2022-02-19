@@ -47,6 +47,8 @@ void loop() {
     confirmChanges(board.moveString);
   }
 
+  screen.loop();
+
   // board.printBinary();
   // board.printReadings();
   board.printFullStatus();
@@ -67,7 +69,7 @@ void confirmChanges(String move) {
     }
   } else {
     board.resetState(gameState.currentFen);
-    screen.printMove(gameState.currentPlayer, "satisfied");
+    screen.temporaryPrintMove(gameState.currentPlayer, "satisfied");
   }
 
   gameState.nextPlayer();
@@ -93,7 +95,7 @@ int handleMove(String data) {
 
     return 1;
   } else {
-    screen.rawPrint("Invalid JSON from web", data);
+    screen.temporaryRawPrint("Invalid JSON from web", data);
     return 0;
   }
 }

@@ -1,15 +1,36 @@
 #include "lib/Constants.h"
-
 #include <LiquidCrystal.h>
+
+#define TEMPORARY_MESSAGE_DELAY 1000
 
 class Screen {
 public:
+    GameState* gameState;
     LiquidCrystal *lcd;
+
     String currentMessage;
+    long resumeNormalProgrammingAt;
+    bool temporaryProgramming = false;
 
     Screen() {
       lcd = new LiquidCrystal(A0, A1, A2, A3, A4, A5);
       lcd->begin(16, 2);
+    }
+
+    void init(GameState* gs) {
+      gameState = gs;
+    }
+
+    void loop() {
+      if (temporaryProgramming && millis() < resumeNormalProgrammingAt) {
+        return;
+      }
+
+      resumeNormalProgramming();
+    }
+
+    void resumeNormalProgramming() {
+      rawPrint("", gameState->currentMessage);
     }
 
     void printMove(int player, String move) {
@@ -18,6 +39,14 @@ public:
       String line_2 = "   " + move;
 
       rawPrint(line_1, line_2);
+    }
+
+    void temporaryPrintMove(int player, String move) {
+      String playerString = player == WHITE ? "White" : "Black";
+      String line_1 = " " + playerString + "'s Move:";
+      String line_2 = "   " + move;
+
+      temporaryRawPrint(line_1, line_2);
     }
 
     void rawPrint(String line_1) { rawPrint(line_1, ""); }
@@ -32,6 +61,13 @@ public:
       lcd->print(line_2);
 
       currentMessage = newMessage;
+    }
+
+    void temporaryRawPrint(String line_1, String line_2) {
+      rawPrint(line_1, line_2);
+
+      temporaryProgramming = true;
+      resumeNormalProgrammingAt = millis() + TEMPORARY_MESSAGE_DELAY;
     }
 
     void introSequence(String player) {

@@ -404,7 +404,7 @@ private:
     if (allUpCount == 0 && allDownCount == 0) {
       stable = true;
 
-      screen->rawPrint(gameState->currentMessage);
+      screen->resumeNormalProgramming();
     } else {
       String requiredFixes = "";
 

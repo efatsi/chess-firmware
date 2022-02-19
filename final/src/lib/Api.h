@@ -37,9 +37,7 @@ public:
       gameState->currentMessage = response.dig("message");
       digitalWrite(ledPin, LOW);
 
-      screen->rawPrint("Success!", gameState->currentMessage);
-      delay(1000);
-      screen->rawPrint(gameState->currentMessage);
+      screen->temporaryRawPrint("Success!", gameState->currentMessage);
 
       return true;
     } else {
@@ -88,10 +86,10 @@ private:
 
       // Save and print current game message
       gameState->currentMessage = response.message();
-      screen->rawPrint("   Connected!", response.message());
+      screen->temporaryRawPrint("Connected!", response.message());
     } else {
       Serial.println("Failed response: " + response.error());
-      screen->rawPrint("Invalid Move: ", response.error());
+      screen->temporaryRawPrint("Invalid Move:", response.error());
     }
   }
 };
