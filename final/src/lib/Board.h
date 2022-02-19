@@ -3,6 +3,8 @@
 
 class Board {
 public:
+  Screen* screen;
+  GameState* gameState;
   Position positions[64] = {
     Position("a8", BLACK),
     Position("b8", BLACK),
@@ -94,7 +96,6 @@ public:
   ChangedPosition downs[5];
 
   String moveString;
-  String requiredFixes;
 
   bool stable = false;
   bool wasUnstable = false;
@@ -110,14 +111,14 @@ public:
     pinMode(sensorPin, INPUT);
   }
 
+  void init(Screen* s, GameState* gs) {
+    screen = s;
+    gameState = gs;
+  }
+
   void determineState(int currentPlayer) {
     _determinePositionStates();
-
-    if (stable) {
-      _verifyStatuses(currentPlayer);
-    } else {
-      _identifyInvalidPositions();
-    }
+    _verifyStatuses(currentPlayer);
   }
 
   bool moveDetected(int currentPlayer) {
@@ -179,8 +180,10 @@ public:
 
     stable = false;
 
-    _determinePositionStates();
-    _identifyInvalidPositions();
+    while (!stable) {
+      _determinePositionStates();
+      _checkStability();
+    }
   }
 
   void printReadings() {
@@ -397,11 +400,13 @@ private:
     }
   }
 
-  void _identifyInvalidPositions() {
+  void _checkStability() {
     if (allUpCount == 0 && allDownCount == 0) {
       stable = true;
+
+      screen->rawPrint(gameState->currentMessage);
     } else {
-      requiredFixes = "";
+      String requiredFixes = "";
 
       for (int i = 0; i < stableUpCount; i++) {
         requiredFixes = requiredFixes + ups[i].position + " ";
@@ -409,6 +414,8 @@ private:
       for (int i = 0; i < stableDownCount; i++) {
         requiredFixes = requiredFixes + downs[i].position + " ";
       }
+
+      screen->rawPrint("Fix positions:", requiredFixes);
     }
   }
 

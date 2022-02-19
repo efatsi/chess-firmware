@@ -9,6 +9,7 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 
 GameState gameState;
 Screen screen;
+
 Board board;
 Api api;
 
@@ -34,6 +35,7 @@ void setup() {
 
   screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
+  board.init(&screen, &gameState);
   api.init(homePlayer, &screen, &board, &gameState);
   api.connectToTheInternets();
 }
@@ -41,15 +43,7 @@ void setup() {
 void loop() {
   board.determineState(gameState.currentPlayer);
 
-  // Check you're starting a move at the current FED state
-  if (board.unstable()) {
-    board.wasUnstable = true;
-    screen.rawPrint("Fix positions:", board.requiredFixes);
-  } else if (board.wasUnstable) {
-    board.wasUnstable = false;
-    screen.rawPrint(gameState.currentMessage);
-  } else if (board.moveDetected(gameState.currentPlayer)) {
-    // Check for a confirmed move
+  if (board.moveDetected(gameState.currentPlayer)) {
     confirmChanges(board.moveString);
   }
 
@@ -73,10 +67,7 @@ void confirmChanges(String move) {
     }
   } else {
     board.resetState(gameState.currentFen);
-
-    if (board.stable) {
-      screen.printMove(gameState.currentPlayer, "satisfied");
-    }
+    screen.printMove(gameState.currentPlayer, "satisfied");
   }
 
   gameState.nextPlayer();
