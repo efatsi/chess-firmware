@@ -4,11 +4,13 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 #include "lib/GameState.h"
 #include "lib/Screen.h"
 #include "lib/Board.h"
+#include "lib/Printer.h"
 #include "lib/Constants.h"
 #include "lib/Api.h"
 
 GameState gameState;
 Screen screen;
+Printer printer;
 
 Board board;
 Api api;
@@ -35,6 +37,7 @@ void setup() {
 
   screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
+  printer.init(&board, &gameState);
   board.init(&screen, &gameState);
   api.init(homePlayer, &screen, &board, &gameState);
   api.connectToTheInternets();
@@ -48,10 +51,7 @@ void loop() {
   }
 
   screen.loop();
-
-  // board.printBinary();
-  // board.printReadings();
-  board.printFullStatus();
+  printer.loop();
 
   delay(50);
 }
