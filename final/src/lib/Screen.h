@@ -12,12 +12,10 @@ public:
   long resumeNormalProgrammingAt;
   bool temporaryProgramming = false;
 
-  Screen() {
+  Screen(GameState* gs) {
     lcd = new LiquidCrystal(A0, A1, A2, A3, A4, A5);
     lcd->begin(16, 2);
-  }
 
-  void init(GameState* gs) {
     gameState = gs;
   }
 

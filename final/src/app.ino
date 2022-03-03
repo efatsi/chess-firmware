@@ -9,7 +9,7 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 #include "lib/Api.h"
 
 GameState gameState;
-Screen screen;
+Screen screen(&gameState);
 
 Board board(&screen, &gameState);
 Api api(&screen, &board, &gameState);
