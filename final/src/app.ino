@@ -22,6 +22,8 @@ int playerPin = D6;
 int homePlayer;
 int awayPlayer;
 
+bool receivedMove = false;
+
 void setup() {
   Particle.function("other-move", handleMove);
 
@@ -61,19 +63,22 @@ void confirmChanges(String move) {
   if (homePlayer == gameState.currentPlayer) {
     screen.printMove(gameState.currentPlayer, move);
 
-    bool success = api.postMove(move);
-    if (!success) {
+    if (api.postMove(move)) {
+      gameState.nextPlayer();
+    } else {
       board.resetState(gameState.currentFen);
-      return;
     }
   } else {
     board.resetState(gameState.currentFen);
 
-    digitalWrite(ledPin, LOW);
-    screen.temporaryPrintMove(gameState.currentPlayer, "satisfied");
-  }
+    if (receivedMove) {
+      receivedMove = false;
+      digitalWrite(ledPin, LOW);
+      screen.temporaryPrintMove(gameState.currentPlayer, "satisfied");
 
-  gameState.nextPlayer();
+      gameState.nextPlayer();
+    }
+  }
 }
 
 int handleMove(String data) {
@@ -92,6 +97,7 @@ int handleMove(String data) {
     screen.printMove(gameState.currentPlayer, instruction + " ...");
 
     // Turn on light - indicating it's home player's turn
+    receivedMove = true;
     digitalWrite(ledPin, HIGH);
 
     return 1;
