@@ -37,7 +37,7 @@ public:
       gameState->currentFen = response.dig("fen");
       gameState->currentMessage = response.dig("message");
 
-      screen->temporaryRawPrint("  ✓ ✔ ✓ ✔ ✓ ✔", "   " + move);
+      screen->temporaryRawPrint("  Success:", "   " + move);
 
       return true;
     } else {

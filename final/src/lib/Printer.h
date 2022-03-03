@@ -1,5 +1,4 @@
-#include "lib/Constants.h"
-// C++ parser hurts on this file without some sort of #include :shrug:
+// C++ parser hurts on this file without something (whitespace) before the class
 
 class Printer {
 public:
