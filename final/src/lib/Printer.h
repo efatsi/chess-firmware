@@ -20,10 +20,13 @@ public:
       switch (printMode) {
         case 1:
           _printFullStatus();
+          break;
         case 2:
           _printBinary();
+          break;
         case 3:
           _printReadings();
+          break;
       }
     }
   }
@@ -35,18 +38,25 @@ private:
       int input = Serial.read();
 
       // say what you got:
-      Serial.print("I received: ");
+      Serial.print("Received input: ");
       Serial.println(input, DEC);
 
       switch (input) {
         case 's':
           printing = !printing;
+          break;
         case '1':
           printMode = 1;
+          Serial.println("Setting print mode: FullStatus");
+          break;
         case '2':
           printMode = 2;
+          Serial.println("Setting print mode: Binary");
+          break;
         case '3':
           printMode = 3;
+          Serial.println("Setting print mode: Readings");
+          break;
       }
     }
   }
