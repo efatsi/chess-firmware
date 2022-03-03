@@ -1,7 +1,7 @@
 #include "lib/Constants.h"
 #include <LiquidCrystal.h>
 
-#define TEMPORARY_MESSAGE_DELAY 1000
+#define TEMPORARY_MESSAGE_DELAY 2000
 
 class Screen {
 public:
@@ -20,14 +20,13 @@ public:
   }
 
   void loop() {
-    if (temporaryProgramming && millis() < resumeNormalProgrammingAt) {
-      return;
+    if (temporaryProgramming && millis() > resumeNormalProgrammingAt) {
+      resumeNormalProgramming();
     }
-
-    resumeNormalProgramming();
   }
 
   void resumeNormalProgramming() {
+    temporaryProgramming = false;
     rawPrint("", gameState->currentMessage);
   }
 
@@ -51,6 +50,11 @@ public:
   void rawPrint(String line_1, String line_2) {
     String newMessage = line_1 + line_2;
     if (newMessage == currentMessage) { return; }
+
+    Serial.println("Printing:");
+    Serial.println(line_1);
+    Serial.println(line_2);
+    Serial.println("");
 
     lcd->clear();
     lcd->setCursor(0, 0);
