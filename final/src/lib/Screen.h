@@ -59,8 +59,7 @@ public:
     lcd->clear();
     lcd->setCursor(0, 0);
     lcd->print(line_1);
-    lcd->setCursor(0, 1);
-    lcd->print(line_2);
+    _stretchedPrint(1, line_2);
 
     currentMessage = newMessage;
   }
@@ -93,6 +92,22 @@ private:
 
       lcd->print(" ");
       if (!(i >= 16 && i < 23)) delay(50);
+    }
+  }
+
+  void _stretchedPrint(int row, String line) {
+    int length = line.length();
+
+    if (length <= 16) {
+      lcd->setCursor(0, row);
+      lcd->print(line);
+    } else {
+      for (size_t i = 0; i < 3 + length - 16; i += 3) {
+        lcd->setCursor(0, row);
+        lcd->print(line.substring(i) + "   ");
+
+        delay(400);
+      }
     }
   }
 };

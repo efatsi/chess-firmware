@@ -42,7 +42,7 @@ public:
       return true;
     } else {
       gameState->currentFen = response.dig("fen");
-      screen->rawPrint("Error:", response.error());
+      screen->rawPrint(" Error:", response.error());
       delay(1000);
 
       return false;
