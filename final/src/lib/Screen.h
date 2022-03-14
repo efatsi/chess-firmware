@@ -12,11 +12,23 @@ public:
   long resumeNormalProgrammingAt;
   bool temporaryProgramming = false;
 
+  int rPin = DAC;
+  int gPin = WKP;
+  int bPin = RX;
+
   Screen(GameState* gs) {
     lcd = new LiquidCrystal(A0, A1, A2, A3, A4, A5);
     lcd->begin(16, 2);
 
     gameState = gs;
+
+    pinMode(rPin, OUTPUT);
+    pinMode(gPin, OUTPUT);
+    pinMode(bPin, OUTPUT);
+
+    analogWrite(rPin, 255); // doesn't work :(
+    analogWrite(gPin, 128);
+    analogWrite(bPin, 255);
   }
 
   void loop() {

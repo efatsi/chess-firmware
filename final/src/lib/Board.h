@@ -81,7 +81,7 @@ public:
 
   const int masterPins[3] = {D0, D1, D2};
   const int slavePins[3]  = {D3, D4, D5};
-  const int sensorPin = A6;
+  const int sensorPin = TX;
 
   int allReadings[64];
   int upperNorm;
