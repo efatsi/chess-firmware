@@ -124,16 +124,16 @@ public:
 
     int waitingPlayer = WHITE + BLACK - currentPlayer;
     if (stableUpCount == 1 && stableDownCount == 1) {
-      if (ups[0].wasOccupiedBy == currentPlayer && downs[0].wasOccupiedBy == waitingPlayer) {
-        // current captured waiting
-        moveString = ups[0].position + "x" + downs[0].position;
-        return true;
-      } else if (ups[0].wasOccupiedBy == currentPlayer && downs[0].wasOccupiedBy == EMPTY) {
+      if (ups[0].wasOccupiedBy == currentPlayer && downs[0].wasOccupiedBy == EMPTY) {
         // moved to empty space
         moveString = ups[0].position + "-" + downs[0].position;
         return true;
+      } else if (ups[0].wasOccupiedBy == currentPlayer && downs[0].wasOccupiedBy == waitingPlayer) {
+        // current captured waiting
+        moveString = ups[0].position + "x" + downs[0].position;
+        return true;
       } else {
-        // TODO: en pessant / castle / orrr something's not right
+        // TODO: castle / en pessant / orrr something's not right
       }
     }
 

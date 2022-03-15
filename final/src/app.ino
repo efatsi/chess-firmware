@@ -30,14 +30,7 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   pinMode(playerPin, INPUT);
 
-  if (digitalRead(playerPin)) {
-    homePlayer = WHITE;
-    awayPlayer = BLACK;
-  } else {
-    homePlayer = BLACK;
-    awayPlayer = WHITE;
-  }
-
+  setHomePlayer();
   screen.introSequence(homePlayer == WHITE ? "WHITE" : "BLACK");
 
   api.init(homePlayer);
@@ -81,7 +74,20 @@ void confirmChanges(String move) {
   }
 }
 
+void setHomePlayer() {
+  if (digitalRead(playerPin)) {
+    homePlayer = WHITE;
+    awayPlayer = BLACK;
+  } else {
+    homePlayer = BLACK;
+    awayPlayer = WHITE;
+  }
+}
+
 int handleMove(String data) {
+  Serial.println("Received Move:");
+  Serial.println(data);
+
   JsonParser parser;
   parser.clear();
   parser.addString(data);
