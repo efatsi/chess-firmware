@@ -82,7 +82,7 @@ private:
         Position &position = board->positions[index];
 
         Serial.print(position.value);
-        Serial.print(" ");
+        Serial.print("\t");
       }
 
       Serial.println();
