@@ -181,6 +181,9 @@ public:
     while (!stable) {
       _determinePositionStates();
       _checkStability();
+
+      // Call this so the photon doesn't freeze in the while loop
+      Particle.process();
     }
   }
 
