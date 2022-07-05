@@ -21,13 +21,9 @@ public:
 
   void loop() {
     if (temporaryProgramming && millis() > resumeNormalProgrammingAt) {
-      resumeNormalProgramming();
+      temporaryProgramming = false;
+      rawPrint("", gameState->currentMessage);
     }
-  }
-
-  void resumeNormalProgramming() {
-    temporaryProgramming = false;
-    rawPrint("", gameState->currentMessage);
   }
 
   void printMove(int player, String move) {

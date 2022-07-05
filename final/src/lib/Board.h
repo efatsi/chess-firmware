@@ -284,8 +284,6 @@ private:
   void _checkStability() {
     if (allUpCount == 0 && allDownCount == 0) {
       stable = true;
-
-      screen->resumeNormalProgramming();
     } else {
       String requiredFixes = "";
 
@@ -296,7 +294,7 @@ private:
         requiredFixes = requiredFixes + downs[i].position + " ";
       }
 
-      screen->rawPrint("Fix positions:", requiredFixes);
+      screen->temporaryRawPrint("Fix positions:", requiredFixes);
     }
   }
 
